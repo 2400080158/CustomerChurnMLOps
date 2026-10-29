@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Churn Prediction</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172033;
+    }
+
+    header {
+      background: #14213d;
+      color: white;
+      padding: 24px 7%;
+    }
+
+    header h1 { margin: 0 0 8px; font-size: 26px; }
+    header p { margin: 0; color: #cbd5e1; }
+
+    main {
+      max-width: 1050px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+
+    .intro { margin-bottom: 24px; }
+    .intro h2 { margin-bottom: 8px; }
+    .intro p { color: #64748b; line-height: 1.6; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 5px 20px #0f172a0b;
+    }
+
+    .card h3 { margin-top: 0; }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: 2px solid #93c5fd;
+      border-color: #2563eb;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    button {
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .predict {
+      flex: 1;
+      background: #2563eb;
+      color: white;
+    }
+
+    .predict:hover { background: #1d4ed8; }
+    .predict:disabled { opacity: 0.6; cursor: wait; }
+
+    .reset {
+      background: #e2e8f0;
+      color: #172033;
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 9px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+
+    .result h4 { margin: 0 0 8px; }
+    .result p { margin: 0; line-height: 1.5; }
+    .result.success { background: #ecfdf5; border-color: #a7f3d0; }
+    .result.error { background: #fef2f2; border-color: #fecaca; }
+
+    .hidden { display: none; }
+
+    .side p {
+      color: #64748b;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .step {
+      padding: 13px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .step:last-child { border-bottom: 0; }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 720px) {
+      .layout { grid-template-columns: 1fr; }
+      .fields { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Customer Churn Prediction</h1>
+    <p>Machine Learning | Scikit-learn | FastAPI | MLOps</p>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>Customer Analytics Dashboard</h2>
+      <p>
+        Enter customer information to predict whether the customer
+        is likely to churn using the trained machine learning model.
+      </p>
+    </section>
+
+    <div class="layout">
+      <section class="card">
+        <h3>Customer Information</h3>
+
+        <form id="churnForm">
+          <div class="fields">
+            <div>
+              <label for="tenure">Tenure (months)</label>
+              <input id="tenure" type="number" min="0" step="any" value="12" required>
+            </div>
+
+            <div>
+              <label for="monthly_charges">Monthly Charges</label>
+              <input id="monthly_charges" type="number" min="0" step="any" value="75" required>
+            </div>
+
+            <div>
+              <label for="total_charges">Total Charges</label>
+              <input id="total_charges" type="number" min="0" step="any" value="900" required>
+            </div>
+
+            <div>
+              <label for="support_calls">Support Calls</label>
+              <input id="support_calls" type="number" min="0" step="any" value="3" required>
+            </div>
+
+            <div>
+              <label for="contract_type">Contract Type (numeric)</label>
+              <input id="contract_type" type="number" step="any" value="1" required>
+            </div>
+
+            <div>
+              <label for="payment_delay">Payment Delay</label>
+              <input id="payment_delay" type="number" min="0" step="any" value="2" required>
+            </div>
+
+            <div>
+              <label for="usage_score">Usage Score</label>
+              <input id="usage_score" type="number" step="any" value="60" required>
+            </div>
+
+            <div>
+              <label for="complaints">Complaints</label>
+              <input id="complaints" type="number" min="0" step="any" value="1" required>
+            </div>
+
+            <div>
+              <label for="age">Customer Age</label>
+              <input id="age" type="number" min="0" step="any" value="35" required>
+            </div>
+
+            <div>
+              <label for="service_count">Service Count</label>
+              <input id="service_count" type="number" min="0" step="any" value="3" required>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="predict" id="predictBtn" type="submit">
+              Predict Churn
+            </button>
+            <button class="reset" type="reset">Reset</button>
+          </div>
+        </form>
+
+        <div id="result" class="result hidden" role="status" aria-live="polite">
+          <h4 id="resultTitle">Prediction Result</h4>
+          <p id="resultText"></p>
+        </div>
+      </section>
+
+      <aside class="card side">
+        <h3>How It Works</h3>
+
+        <div class="step">
+          <strong>01. Enter details</strong>
+          <p>Provide the customer's ten numerical features.</p>
+        </div>
+
+        <div class="step">
+          <strong>02. Run prediction</strong>
+          <p>The webpage sends the details to your FastAPI backend.</p>
+        </div>
+
+        <div class="step">
+          <strong>03. View the result</strong>
+          <p>Your trained model returns the churn classification.</p>
+        </div>
+
+        <div class="step">
+          <strong>Technology Stack</strong>
+          <p>HTML, CSS, JavaScript, Python, FastAPI, Scikit-learn, MLflow and Docker.</p>
+        </div>
+
+        <p>
+          <strong>Note:</strong> This model predicts churn using
+          the features on which it was trained. Results are not
+          a guarantee of actual customer behavior.
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    Customer Churn Prediction System | Academic MLOps Project
+  </footer>
+
+  <script>
+    const form = document.getElementById("churnForm");
+    const result = document.getElementById("result");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultText = document.getElementById("resultText");
+    const predictBtn = document.getElementById("predictBtn");
+
+    const featureNames = [
+      "tenure",
+      "monthly_charges",
+      "total_charges",
+      "support_calls",
+      "contract_type",
+      "payment_delay",
+      "usage_score",
+      "complaints",
+      "age",
+      "service_count"
+    ];
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const customer = {};
+
+      for (const name of featureNames) {
+        const value = document.getElementById(name).value;
+
+        if (value.trim() === "" || !Number.isFinite(Number(value))) {
+          showMessage("Invalid input", "Please enter a valid number for every field.", "error");
+          return;
+        }
+
+        customer[name] = Number(value);
+      }
+
+      predictBtn.disabled = true;
+      predictBtn.textContent = "Predicting...";
+      showMessage("Please wait", "Contacting the machine learning model...", "");
+
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(customer)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail
+            ? JSON.stringify(data.detail)
+            : "The prediction request failed.");
+        }
+
+        showMessage(
+          "Prediction Result",
+          data.result || (
+            Number(data.churn_prediction) === 1
+              ? "Likely to churn"
+              : "Not likely to churn"
+          ),
+          "success"
+        );
+
+      } catch (error) {
+        showMessage(
+          "Prediction Failed",
+          "Could not get a prediction. Check that the FastAPI server is running. Details: " + error.message,
+          "error"
+        );
+      } finally {
+        predictBtn.disabled = false;
+        predictBtn.textContent = "Predict Churn";
+      }
+    });
+
+    function showMessage(title, message, type) {
+      result.className = "result" + (type ? " " + type : "");
+      resultTitle.textContent = title;
+      resultText.textContent = message;
+    }
+
+    form.addEventListener("reset", function() {
+      result.className = "result hidden";
+    });
+  </script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+from fastapi.responses import FileResponse
 from pathlib import Path
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -27,7 +28,9 @@ class Customer(BaseModel):
 
 @app.get("/")
 def home():
-    return {"message": "Customer Churn Prediction API is running"}
+    return FileResponse(
+        BASE_DIR / "src" / "static" / "index.html"
+    )
 
 
 @app.post("/predict")
